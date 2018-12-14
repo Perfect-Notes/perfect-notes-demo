@@ -20,16 +20,16 @@ import java.lang.reflect.Array;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    ListView listView;
+    //ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        listView = findViewById(R.id.lv1);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        //listView = findViewById(R.id.lv1);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -47,8 +47,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         String[] string=new String[]{"TIme Table","Today's Events","Notes","Reminders"};
-        ArrayAdapter<String> adapter=new ArrayAdapter(MainActivity.this,android.R.layout.simple_expandable_list_item_1,string);
-        listView.setAdapter(adapter);
+        //ArrayAdapter<String> adapter=new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_list_item_1,string);
+        //listView.setAdapter(adapter);
     }
 
     @Override
@@ -91,11 +91,16 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.time_table) {
             // Handle the camera action
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container,new time_table_fragment()).commit();
+
         } else if (id == R.id.events) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container,new time_table_fragment()).commit();
 
         } else if (id == R.id.reminders) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container,new ReminderFragment()).commit();
 
         } else if (id == R.id.notes) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container,new ToDoFragment()).commit();
 
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
