@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EditToDo"
+    android:orientation="vertical"
+    android:padding="20dp"
+    >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/subjectHeader"
+        android:text="SAMPLE TEXT"
+        android:textSize="25sp"
+        android:textColor="#000"
+        android:textStyle="bold"
+        />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/straight_line"
+        android:layout_marginTop="15dp"
+        android:layerType="software" />
+
+    <TextView
+        android:id="@+id/description_edit_note"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:textSize="14sp"
+        android:text="SAMPLE TEXT"
+        android:textColor="#000"
+        />
+
+</LinearLayout>

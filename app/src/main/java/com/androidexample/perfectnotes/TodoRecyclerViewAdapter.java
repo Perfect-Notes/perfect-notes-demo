@@ -1,8 +1,10 @@
 package com.androidexample.perfectnotes;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -46,7 +48,7 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
         return subject.size();
     }
 
-    class myViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
+    class myViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener,View.OnClickListener{
             TextView listElementHeader;
             CardView todoListCard;
         public myViewHolder(@NonNull View itemView) {
@@ -54,6 +56,7 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
             listElementHeader = itemView.findViewById(R.id.listElementHeader);
             todoListCard = itemView.findViewById(R.id.todoListCard);
             todoListCard.setOnLongClickListener(this);
+            todoListCard.setOnClickListener(this);
         }
 
         @Override
@@ -84,5 +87,17 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
             return true;
         }
 
+        @Override
+        public void onClick(View v) {
+            int position = getAdapterPosition();
+            Intent intent = new Intent(v.getContext(),EditToDo.class);
+            intent.putExtra("SUBJECT_LIST",subject);
+            intent.putExtra("BODY_LIST",description);
+            intent.putExtra("POSITION",position);
+            //intent.putExtra("BODY",description.get(position));
+            //context.startActivity(intent);
+            ((Activity) context).startActivityForResult(intent,2);
+        }
     }
+
 }

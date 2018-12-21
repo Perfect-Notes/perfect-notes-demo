@@ -1,7 +1,9 @@
 package com.androidexample.perfectnotes;
 
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
@@ -61,6 +63,7 @@ public class ToDoFragment extends Fragment {
         addNote = new Dialog(getContext());
         addNote.setCancelable(true);
         addNote.setContentView(R.layout.to_do_custom_dialog);
+
     }
 
     @Override
@@ -153,10 +156,23 @@ public class ToDoFragment extends Fragment {
             });
 
         }
-
         @Override
         public void afterTextChanged(Editable s) {
 
         }
     };
+
+    /*@Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode == 2){
+            if(resultCode == Activity.RESULT_OK){
+                ArrayList<String> sub = data.getStringArrayListExtra("SUB_FINAL");
+                ArrayList<String> desc = data.getStringArrayListExtra("DESC_FINAL");
+                subjectList = sub;
+                descriptionList = desc;
+                todoAdapter.notifyDataSetChanged();
+            }
+        }
+    }*/
 }
