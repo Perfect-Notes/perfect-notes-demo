@@ -5,6 +5,8 @@ import android.arch.core.executor.TaskExecutor;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -66,21 +68,25 @@ public class EditToDo extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if(requestCode == 1){
-            if(resultCode == RESULT_OK){
-                subject = data.getExtras().getStringArrayList("SUB_RESULT");
-                description = data.getExtras().getStringArrayList("DESC_RESULT");
-                subjectTV.setText(subject.get(pos));
-                descriptionTV.setText(description.get(pos));
-            }
-        }
+        Intent i=new Intent();
+
+        i.putExtra("SUB_RESULT",data.getStringArrayListExtra("SUB_RESULT"));
+        i.putExtra("DESC_RESULT",data.getStringArrayListExtra("DESC_RESULT"));
+        i.putExtra("POS",data.getIntExtra("POS",0));
+        setResult(resultCode,i);
+        finish();
+
     }
 
     @Override
     public void onBackPressed() {
-        /*Intent returnIntent = new Intent();
-        returnIntent.putExtra("SUB_FINAL",subject);
-        returnIntent.putExtra("DESC_FINAL",description);
-        setResult(Activity.RESULT_OK,returnIntent);*/
+        super.onBackPressed();
+        Fragment f=new ToDoFragment();
+        Bundle data=new Bundle();
+        data.putStringArrayList("DESCRIPTION",description);
+        data.putStringArrayList("SUBJECTS",subject);
+        data.putBoolean("BACK_PRESSED",true);
+        f.setArguments(data);
+
     }
 }

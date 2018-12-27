@@ -3,6 +3,7 @@ package com.androidexample.perfectnotes;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -53,7 +54,10 @@ public class EditNote extends AppCompatActivity {
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("SUB_RESULT",subject);
                 returnIntent.putExtra("DESC_RESULT",description);
+                returnIntent.putExtra("POS",pos);
+
                 setResult(Activity.RESULT_OK,returnIntent);
+
                 finish();
             }
         });
