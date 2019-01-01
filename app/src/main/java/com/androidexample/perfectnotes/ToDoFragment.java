@@ -3,7 +3,10 @@ package com.androidexample.perfectnotes;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
@@ -35,9 +38,11 @@ public class ToDoFragment extends Fragment {
     TextInputEditText description,subject;
     RecyclerView todoList;
     TodoRecyclerViewAdapter todoAdapter;
-    ArrayList<String> descriptionList;
-    ArrayList<String> subjectList;
+   // ArrayList<String> descriptionList;
+    //ArrayList<String> subjectList;
     Button add;
+    SQLiteDatabase database;
+    int pos;
 
     public ToDoFragment() {
         // Required empty public constructor
@@ -56,13 +61,16 @@ public class ToDoFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        descriptionList = new ArrayList<>();
-        subjectList = new ArrayList<>();
+        //descriptionList = new ArrayList<>();
+        //subjectList = new ArrayList<>();
 
         //dialog
         addNote = new Dialog(getContext());
         addNote.setCancelable(true);
         addNote.setContentView(R.layout.to_do_custom_dialog);
+        ToDoDatabaseHelper helper = new ToDoDatabaseHelper(getActivity());
+        database = helper.getWritableDatabase();
+        pos=0;
 
     }
 
@@ -73,7 +81,8 @@ public class ToDoFragment extends Fragment {
         todoList.setLayoutManager(new LinearLayoutManager(getContext()));
         todoList.setHasFixedSize(true);
         //todoList.setAdapter(new TodoRecyclerViewAdapter(subjectList,descriptionList));
-        todoAdapter = new TodoRecyclerViewAdapter(subjectList,descriptionList,getContext());
+        //todoAdapter = new TodoRecyclerViewAdapter(subjectList,descriptionList,getContext());
+        todoAdapter = new TodoRecyclerViewAdapter(getAllItems(),getContext());
         todoList.setAdapter(todoAdapter);
     }
 
@@ -142,9 +151,11 @@ public class ToDoFragment extends Fragment {
                         sub = subject.getText().toString();
                         desc = description.getText().toString();
                         Toast.makeText(getContext(),sub + " " + desc,Toast.LENGTH_SHORT).show();
-                        subjectList.add(sub);
-                        descriptionList.add(desc);
-                        todoAdapter.notifyDataSetChanged();
+                        pos++;
+                        addData(sub,desc,pos);
+                        //subjectList.add(sub);
+                        //descriptionList.add(desc);
+                        //todoAdapter.notifyDataSetChanged();
                     }
                     catch (NullPointerException e){
                         e.printStackTrace();
@@ -162,17 +173,18 @@ public class ToDoFragment extends Fragment {
         }
     };
 
-    /*@Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode,resultCode,data);
-        if(requestCode == 2){
-            if(resultCode == Activity.RESULT_OK){
-                ArrayList<String> sub = data.getStringArrayListExtra("SUB_FINAL");
-                ArrayList<String> desc = data.getStringArrayListExtra("DESC_FINAL");
-                subjectList = sub;
-                descriptionList = desc;
-                todoAdapter.notifyDataSetChanged();
-            }
-        }
-    }*/
+    public Cursor getAllItems(){
+        return database.query(ToDoDatabaseHelper.TABLE_NAME,null,null,null,null,null,ToDoDatabaseHelper.COL_2);
+    }
+
+    public void addData(String subject, String description, int pos){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ToDoDatabaseHelper.COL_2,pos);
+        contentValues.put(ToDoDatabaseHelper.COL_3,subject);
+        contentValues.put(ToDoDatabaseHelper.COL_4,description);
+
+        database.insert(ToDoDatabaseHelper.TABLE_NAME,null,contentValues);
+        todoAdapter.swapCursor(getAllItems());
+    }
+
 }

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -17,12 +18,19 @@ import java.util.ArrayList;
 
 public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerViewAdapter.myViewHolder> {
 
-    ArrayList<String> subject;
+    /*ArrayList<String> subject;
     ArrayList<String> description;
     Context context;
     TodoRecyclerViewAdapter(ArrayList<String> subject,ArrayList<String> description,Context context){
         this.subject = subject;
         this.description = description;
+        this.context = context;
+    }*/
+    Context context;
+    Cursor cursor;
+
+    TodoRecyclerViewAdapter(Cursor cursor,Context context){
+        this.cursor = cursor;
         this.context = context;
     }
 
@@ -39,13 +47,28 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
     @Override
     public void onBindViewHolder(@NonNull final myViewHolder holder, int i) {
 
-        holder.listElementHeader.setText(subject.get(i));
-
+        //holder.listElementHeader.setText(subject.get(i));
+        if(!cursor.moveToPosition(i)){
+            return;
+        }
+        String name = cursor.getString(cursor.getColumnIndex(ToDoDatabaseHelper.COL_3));
+        holder.listElementHeader.setText(name);
     }
 
     @Override
     public int getItemCount() {
-        return subject.size();
+        return cursor.getCount();
+    }
+
+    public void swapCursor(Cursor newCursor){
+        if(cursor != null){
+            cursor.close();
+        }
+
+        cursor = newCursor;
+        if(newCursor != null){
+            notifyDataSetChanged();
+        }
     }
 
     class myViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener,View.OnClickListener{
@@ -62,7 +85,7 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
         @Override
         public boolean onLongClick(View v) {
 
-            final int position = getAdapterPosition();
+            /*final int position = getAdapterPosition();
 
             final AlertDialog.Builder deleteDialog = new AlertDialog.Builder(context);
             deleteDialog.setCancelable(true);
@@ -83,20 +106,20 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
                     dialog.cancel();
                 }
             });
-            deleteDialog.show();
+            deleteDialog.show();*/
             return true;
         }
 
         @Override
         public void onClick(View v) {
-            int position = getAdapterPosition();
+            /*int position = getAdapterPosition();
             Intent intent = new Intent(v.getContext(),EditToDo.class);
             intent.putExtra("SUBJECT_LIST",subject);
             intent.putExtra("BODY_LIST",description);
             intent.putExtra("POSITION",position);
-            //intent.putExtra("BODY",description.get(position));
-            //context.startActivity(intent);
-            ((Activity) context).startActivityForResult(intent,2);
+            intent.putExtra("BODY",description.get(position));
+            context.startActivity(intent);*/
+            //((Activity) context).startActivityForResult(intent,2);
         }
     }
 
