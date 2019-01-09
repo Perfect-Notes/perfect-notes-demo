@@ -3,7 +3,10 @@ package com.androidexample.perfectnotes;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
@@ -34,11 +37,14 @@ public class ToDoFragment extends Fragment {
     TextInputEditText description, subject;
 public     RecyclerView todoList;
     TodoRecyclerViewAdapter todoAdapter;
+
    public ArrayList<String> descriptionList;
     public ArrayList<String> subjectList;
 
 
     Button add;
+    SQLiteDatabase database;
+    int pos;
 
     public ToDoFragment() {
         // Required empty public constructor
@@ -67,11 +73,16 @@ public     RecyclerView todoList;
 
         descriptionList = new ArrayList<>();
         subjectList = new ArrayList<>();
+        //descriptionList = new ArrayList<>();
+        //subjectList = new ArrayList<>();
 
         //dialog
         addNote = new Dialog(getContext());
         addNote.setCancelable(true);
         addNote.setContentView(R.layout.to_do_custom_dialog);
+        ToDoDatabaseHelper helper = new ToDoDatabaseHelper(getActivity());
+        database = helper.getWritableDatabase();
+        pos=0;
 
 
     }
@@ -84,6 +95,10 @@ public     RecyclerView todoList;
         todoList.setHasFixedSize(true);
         //todoList.setAdapter(new TodoRecyclerViewAdapter(subjectList,descriptionList));
         todoAdapter = new TodoRecyclerViewAdapter(subjectList, descriptionList, getContext());
+
+        //todoAdapter = new TodoRecyclerViewAdapter(subjectList,descriptionList,getContext());
+        todoAdapter = new TodoRecyclerViewAdapter(getAllItems(),getContext());
+
         todoList.setAdapter(todoAdapter);
 
     }
@@ -157,8 +172,16 @@ public     RecyclerView todoList;
                         descriptionList.add(desc);
                         todoAdapter.notifyDataSetChanged();
                     } catch (NullPointerException e) {
-                        e.printStackTrace();
+                        Toast.makeText(getContext()," for null pointer " ,Toast.LENGTH_SHORT).show();
+                        pos++;
+
+                        //subjectList.add(sub);
+                        //descriptionList.add(desc);
+                        //todoAdapter.notifyDataSetChanged();
                     }
+//                    catch (NullPointerException e){
+//                        e.printStackTrace();
+//                    }
                     subject.getText().clear();
                     description.getText().clear();
                     addNote.dismiss();
@@ -189,4 +212,18 @@ public     RecyclerView todoList;
             }
         }
     }
+    public Cursor getAllItems(){
+        return database.query(ToDoDatabaseHelper.TABLE_NAME,null,null,null,null,null,ToDoDatabaseHelper.COL_2);
+    }
+
+    public void addData(String subject, String description, int pos){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ToDoDatabaseHelper.COL_2,pos);
+        contentValues.put(ToDoDatabaseHelper.COL_3,subject);
+        contentValues.put(ToDoDatabaseHelper.COL_4,description);
+
+        database.insert(ToDoDatabaseHelper.TABLE_NAME,null,contentValues);
+        todoAdapter.swapCursor(getAllItems());
+    }
+
 }
