@@ -17,7 +17,6 @@ import java.util.ArrayList;
 public class EditNote extends AppCompatActivity {
 
     EditText descriptionET,subjectET;
-    ArrayList<String> subject,description;
     int pos;
     Button saveButton;
     @Override
@@ -31,11 +30,11 @@ public class EditNote extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
 
         if(extras != null){
-            subject = extras.getStringArrayList("SUBJECT_LIST");
-            description = extras.getStringArrayList("BODY_LIST");
-            pos = extras.getInt("POS");
-            descriptionET.setText(description.get(pos));
-            subjectET.setText(subject.get(pos));
+
+            pos = extras.getInt("POSITION");
+            subjectET.setText(extras.getString("SUB"));
+            descriptionET.setText(extras.getString("DESC"));
+
         }
 
 
@@ -46,15 +45,17 @@ public class EditNote extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
+
                 String sub = subjectET.getText().toString();
                 String desc = descriptionET.getText().toString();
-                subject.add(pos,sub);
-                description.add(pos,desc);
 
                 Intent returnIntent = new Intent();
-                returnIntent.putExtra("SUB_RESULT",subject);
-                returnIntent.putExtra("DESC_RESULT",description);
-                returnIntent.putExtra("POS",pos);
+
+                returnIntent.putExtra("POSITION",pos);
+                returnIntent.putExtra("SUB",sub);
+                returnIntent.putExtra("DESC",desc);
 
                 setResult(Activity.RESULT_OK,returnIntent);
 

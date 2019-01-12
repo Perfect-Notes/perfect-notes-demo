@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     //ListView listView;
-    Fragment f;
+    ToDoFragment f;
     public static final String TAG = "Main Activty";
 
     @Override
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        String[] string = new String[]{"TIme Table", "Today's Events", "Notes", "Reminders"};
+        String[] string = new String[]{"Time Table", "Today's Events", "Notes", "Reminders"};
         //ArrayAdapter<String> adapter=new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_list_item_1,string);
         //listView.setAdapter(adapter);
     }
@@ -123,18 +123,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        ArrayList<String> sub = data.getStringArrayListExtra("SUB_RESULT");
-        sub.remove(data.getIntExtra("POS",0)+1);
-
-        data.putExtra("SUB_RESULT", sub);
-        f.onActivityResult(requestCode, resultCode, data);
-        //getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, f).commit();
-//                subjectList = sub;
-//                descriptionList = desc;
-//                todoAdapter.notifyDataSetChanged();
-
-
+        f.onActivityResult(requestCode,resultCode,data);
     }
 }

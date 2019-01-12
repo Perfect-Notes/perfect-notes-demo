@@ -3,16 +3,18 @@ package com.androidexample.perfectnotes;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.ContentValues;
+import android.arch.persistence.room.Room;
+import android.arch.persistence.room.RoomDatabase;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -24,7 +26,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+
+import com.androidexample.perfectnotes.db.TodoDatabse;
+
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -32,18 +38,16 @@ import java.util.ArrayList;
  */
 public class ToDoFragment extends Fragment {
 
-    public static final String TAG = "fragy";
+
+    public List<Todo> todos;
     Dialog addNote;
     TextInputEditText description, subject;
-public     RecyclerView todoList;
+    public RecyclerView todoList;
     TodoRecyclerViewAdapter todoAdapter;
-
-   public ArrayList<String> descriptionList;
-    public ArrayList<String> subjectList;
 
 
     Button add;
-    SQLiteDatabase database;
+    TodoDatabse database;
     int pos;
 
     public ToDoFragment() {
@@ -63,27 +67,33 @@ public     RecyclerView todoList;
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-//        Log.i(TAG, "onCreate: "+getArguments().getBoolean("BACK_PRESSED"));
-        if (getArguments() != null) {
-            if (getArguments().getBoolean("BACK_PRESSED", false)) {
-                ArrayList<String> sub = getArguments().getStringArrayList("SUBJECTS");
-
-            }
-        }
-
-        descriptionList = new ArrayList<>();
-        subjectList = new ArrayList<>();
-        //descriptionList = new ArrayList<>();
-        //subjectList = new ArrayList<>();
-
-        //dialog
         addNote = new Dialog(getContext());
         addNote.setCancelable(true);
         addNote.setContentView(R.layout.to_do_custom_dialog);
-        ToDoDatabaseHelper helper = new ToDoDatabaseHelper(getActivity());
-        database = helper.getWritableDatabase();
-        pos=0;
 
+        ItemTouchHelper.SimpleCallback itemTouchHelper=new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT)
+                {
+                    @Override
+                    public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                        return 0;
+                    }
+
+                    @Override
+                    public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+                        int position=viewHolder.getAdapterPosition();
+                        Todo t=todoAdapter.getTodo(position);
+                        Toast.makeText(getContext(),"DELETING -\n"+t.getSubject() , Toast.LENGTH_SHORT).show();
+                        database.todoDao().deleteTodo(t);
+                        refreshList();
+
+                    }
+                };
+        new ItemTouchHelper(itemTouchHelper).attachToRecyclerView(todoList);
 
     }
 
@@ -91,17 +101,18 @@ public     RecyclerView todoList;
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         todoList = getView().findViewById(R.id.toDoList);
+
+        database = Room.databaseBuilder(getActivity(), TodoDatabse.class, "todoDb").allowMainThreadQueries().build();
+        todos = database.todoDao().getAllTodos();
+
         todoList.setLayoutManager(new LinearLayoutManager(getContext()));
-        todoList.setHasFixedSize(true);
-        //todoList.setAdapter(new TodoRecyclerViewAdapter(subjectList,descriptionList));
-        todoAdapter = new TodoRecyclerViewAdapter(subjectList, descriptionList, getContext());
-
+        todoAdapter = new TodoRecyclerViewAdapter(todos,database, getContext());
         //todoAdapter = new TodoRecyclerViewAdapter(subjectList,descriptionList,getContext());
-        todoAdapter = new TodoRecyclerViewAdapter(getAllItems(),getContext());
-
+//        todoAdapter = new TodoRecyclerViewAdapter(getAllItems(),getContext());
         todoList.setAdapter(todoAdapter);
 
     }
+
 
     @Override
     public void onDestroyView() {
@@ -167,24 +178,28 @@ public     RecyclerView todoList;
                     try {
                         sub = subject.getText().toString();
                         desc = description.getText().toString();
-                        Toast.makeText(getContext(), sub + " " + desc, Toast.LENGTH_SHORT).show();
-                        subjectList.add(sub);
-                        descriptionList.add(desc);
-                        todoAdapter.notifyDataSetChanged();
-                    } catch (NullPointerException e) {
-                        Toast.makeText(getContext()," for null pointer " ,Toast.LENGTH_SHORT).show();
-                        pos++;
+                        Toast.makeText(getContext(), "ADDED -\n"+sub, Toast.LENGTH_SHORT).show();
+                        Todo temp=new Todo(sub, desc);
+                        database.todoDao().insert(temp);
 
-                        //subjectList.add(sub);
-                        //descriptionList.add(desc);
-                        //todoAdapter.notifyDataSetChanged();
+
+
+                    } catch (NullPointerException e) {
+                        Toast.makeText(getContext(), " for null pointer ", Toast.LENGTH_SHORT).show();
+                        pos++;
                     }
+
+                    //subjectList.add(sub);
+                    //descriptionList.add(desc);
+                    //todoAdapter.notifyDataSetChanged();
+
 //                    catch (NullPointerException e){
 //                        e.printStackTrace();
 //                    }
                     subject.getText().clear();
                     description.getText().clear();
                     addNote.dismiss();
+                    refreshList();
                 }
             });
 
@@ -201,29 +216,24 @@ public     RecyclerView todoList;
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 2) {
             if (resultCode == Activity.RESULT_OK) {
-                ArrayList<String> sub = data.getStringArrayListExtra("SUB_RESULT");
-                ArrayList<String> desc = data.getStringArrayListExtra("DESC_RESULT");
-                subjectList = sub;
+                String sub = data.getStringExtra("SUB");
+                String desc = data.getStringExtra("DESC");
+                int pos=data.getIntExtra("POSITION",0);
+                Todo t=todos.get(pos-1);
+                t.setDescription(desc);
+                t.setSubject(sub);
+                database.todoDao().updateTodo(t);
 
-                descriptionList = desc;
-                TodoRecyclerViewAdapter adapter=new TodoRecyclerViewAdapter(sub,desc,getContext());
+                TodoRecyclerViewAdapter adapter = new TodoRecyclerViewAdapter(todos,database, getContext());
                 todoList.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
             }
         }
     }
-    public Cursor getAllItems(){
-        return database.query(ToDoDatabaseHelper.TABLE_NAME,null,null,null,null,null,ToDoDatabaseHelper.COL_2);
+    public void refreshList(){
+        List<Todo> list=database.todoDao().getAllTodos();
+        todos.clear();
+        todos.addAll(list);
+        todoAdapter.notifyDataSetChanged();
     }
-
-    public void addData(String subject, String description, int pos){
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(ToDoDatabaseHelper.COL_2,pos);
-        contentValues.put(ToDoDatabaseHelper.COL_3,subject);
-        contentValues.put(ToDoDatabaseHelper.COL_4,description);
-
-        database.insert(ToDoDatabaseHelper.TABLE_NAME,null,contentValues);
-        todoAdapter.swapCursor(getAllItems());
-    }
-
 }

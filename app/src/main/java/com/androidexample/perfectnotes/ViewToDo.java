@@ -21,11 +21,12 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class EditToDo extends AppCompatActivity {
+public class ViewToDo extends AppCompatActivity {
 
-    TextView subjectTV,descriptionTV;
-    ArrayList<String> description,subject;
+    TextView subjectTV, descriptionTV;
     int pos;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,46 +35,45 @@ public class EditToDo extends AppCompatActivity {
         descriptionTV = findViewById(R.id.description_edit_note);
         Bundle extras = getIntent().getExtras();
 
-        if(extras != null){
-            //String sub = extras.getString("SUBJECT");
-            //String desc = extras.getString("BODY");
-            subject = extras.getStringArrayList("SUBJECT_LIST");
-            description = extras.getStringArrayList("BODY_LIST");
+        if (extras != null) {
+            String sub = extras.getString("SUBJECT");
+            String desc = extras.getString("BODY");
             pos = extras.getInt("POSITION");
-            String sub = subject.get(pos);
-            String desc = description.get(pos);
+
+
             subjectTV.setText(sub);
             descriptionTV.setText(desc);
         }
+
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.edit_note_menu,menu);
+        getMenuInflater().inflate(R.menu.edit_note_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.edit_note_button){
-            Intent intent = new Intent(this,EditNote.class);
-            intent.putExtra("SUBJECT_LIST",subject);
-            intent.putExtra("BODY_LIST",description);
-            intent.putExtra("POS",pos);
-            startActivityForResult(intent,1);
+        if (item.getItemId() == R.id.edit_note_button) {
+            Intent intent = new Intent(this, EditNote.class);
+            intent.putExtra("POSITION", pos);
+            intent.putExtra("SUB", subjectTV.getText().toString());
+            intent.putExtra("DESC", descriptionTV.getText().toString());
+            startActivityForResult(intent, 1);
         }
         return true;
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        Intent i=new Intent();
-
-        i.putExtra("SUB_RESULT",data.getStringArrayListExtra("SUB_RESULT"));
-        i.putExtra("DESC_RESULT",data.getStringArrayListExtra("DESC_RESULT"));
-        i.putExtra("POS",data.getIntExtra("POS",0));
-        setResult(resultCode,i);
+        super.onActivityResult(requestCode, resultCode, data);
+        Intent i = new Intent();
+        i.putExtra("SUB", data.getStringExtra("SUB"));
+        i.putExtra("DESC", data.getStringExtra("DESC"));
+        i.putExtra("POSITION", data.getIntExtra("POSITION", 0));
+        setResult(Activity.RESULT_OK,i);
         finish();
 
     }
@@ -81,11 +81,10 @@ public class EditToDo extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Fragment f=new ToDoFragment();
-        Bundle data=new Bundle();
-        data.putStringArrayList("DESCRIPTION",description);
-        data.putStringArrayList("SUBJECTS",subject);
-        data.putBoolean("BACK_PRESSED",true);
+        Fragment f = new ToDoFragment();
+        Bundle data = new Bundle();
+
+        data.putBoolean("BACK_PRESSED", true);
         f.setArguments(data);
 
     }
