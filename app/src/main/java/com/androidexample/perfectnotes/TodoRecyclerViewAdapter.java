@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,14 +20,7 @@ import java.util.List;
 
 public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerViewAdapter.myViewHolder> {
 
-    //    ArrayList<String> subject;
-//    ArrayList<String> description;
-//    Context context;
-//    TodoRecyclerViewAdapter(ArrayList<String> subject,ArrayList<String> description,Context context){
-//        this.subject = subject;
-//        this.description = description;
-//        this.context = context;
-//    }
+
     public static final String TAG = "recycler check";
     Context context;
     List<Todo> todos;
@@ -51,12 +45,7 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
     public void onBindViewHolder(@NonNull final myViewHolder holder, int i) {
 
         holder.listElementHeader.setText(todos.get(i).getSubject());
-//        if(!cursor.moveToPosition(i)){
-//            return;
-//        }
-//        String name = cursor.getString(cursor.getColumnIndex(ToDoDatabaseHelper.COL_3));
-//        holder.listElementHeader.setText(name);
-    }
+ }
 
     @Override
     public int getItemCount() {
@@ -65,17 +54,7 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
         }
         return todos.size();
     }
-//
-//    public void swapCursor(Cursor newCursor){
-//        if(cursor != null){
-//            cursor.close();
-//        }
-//
-//        cursor = newCursor;
-//        if(newCursor != null){
-//            notifyDataSetChanged();
-//        }
-//    }
+
 
     class myViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener {
         TextView listElementHeader;
@@ -101,10 +80,12 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
             deleteDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    Log.i(TAG, "onClick: " + todos.get(position).getId());
                     database.todoDao().deleteTodo(todos.get(position));
                     todos.remove(position);
                     notifyDataSetChanged();
                     dialog.cancel();
+
                 }
             });
             deleteDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -121,7 +102,7 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
         public void onClick(View v) {
             int position = getAdapterPosition();
             Intent intent = new Intent(v.getContext(), ViewToDo.class);
-            intent.putExtra("POSITION", todos.get(position).getId());
+            intent.putExtra("POSITION", position);
             intent.putExtra("SUBJECT", todos.get(position).getSubject());
             intent.putExtra("BODY", todos.get(position).getDescription());
 //            context.startActivity(intent);
@@ -131,6 +112,22 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
 
     public Todo getTodo(int position) {
         return todos.get(position);
+    }
+    public void insertTodo(Todo todo){
+        todos.add(todo);
+        database.todoDao().insert(todo);
+        Log.i(TAG, "insertTodo: "+todo.getId());
+        notifyDataSetChanged();
+    }
+    public void updateTodo(int pos,Todo todo){
+        Todo t=todos.get(pos);
+        t.setSubject(todo.getSubject());
+        t.setDescription(t.getDescription());
+        database.todoDao().updateTodo(t);
+        todos.clear();
+        todos.addAll(database.todoDao().getAllTodos());
+        notifyDataSetChanged();
+        Log.i(TAG, "updateTodo: "+todo.getId());
     }
 
 }

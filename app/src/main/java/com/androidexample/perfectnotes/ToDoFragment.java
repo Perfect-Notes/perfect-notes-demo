@@ -17,6 +17,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -50,6 +51,7 @@ public class ToDoFragment extends Fragment {
     TodoDatabse database;
     int pos;
 
+    public static final String TAG="frag";
     public ToDoFragment() {
         // Required empty public constructor
     }
@@ -71,30 +73,6 @@ public class ToDoFragment extends Fragment {
         addNote.setCancelable(true);
         addNote.setContentView(R.layout.to_do_custom_dialog);
 
-        ItemTouchHelper.SimpleCallback itemTouchHelper=new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT)
-                {
-                    @Override
-                    public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-                        return 0;
-                    }
-
-                    @Override
-                    public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
-                        return false;
-                    }
-
-                    @Override
-                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
-                        int position=viewHolder.getAdapterPosition();
-                        Todo t=todoAdapter.getTodo(position);
-                        Toast.makeText(getContext(),"DELETING -\n"+t.getSubject() , Toast.LENGTH_SHORT).show();
-                        database.todoDao().deleteTodo(t);
-                        refreshList();
-
-                    }
-                };
-        new ItemTouchHelper(itemTouchHelper).attachToRecyclerView(todoList);
-
     }
 
     @Override
@@ -106,7 +84,7 @@ public class ToDoFragment extends Fragment {
         todos = database.todoDao().getAllTodos();
 
         todoList.setLayoutManager(new LinearLayoutManager(getContext()));
-        todoAdapter = new TodoRecyclerViewAdapter(todos,database, getContext());
+        todoAdapter = new TodoRecyclerViewAdapter(todos, database, getContext());
         //todoAdapter = new TodoRecyclerViewAdapter(subjectList,descriptionList,getContext());
 //        todoAdapter = new TodoRecyclerViewAdapter(getAllItems(),getContext());
         todoList.setAdapter(todoAdapter);
@@ -178,10 +156,8 @@ public class ToDoFragment extends Fragment {
                     try {
                         sub = subject.getText().toString();
                         desc = description.getText().toString();
-                        Toast.makeText(getContext(), "ADDED -\n"+sub, Toast.LENGTH_SHORT).show();
-                        Todo temp=new Todo(sub, desc);
-                        database.todoDao().insert(temp);
-
+                        Toast.makeText(getContext(), "ADDED -\n" + sub, Toast.LENGTH_SHORT).show();
+                        todoAdapter.insertTodo(new Todo(sub,desc));
 
 
                     } catch (NullPointerException e) {
@@ -199,7 +175,6 @@ public class ToDoFragment extends Fragment {
                     subject.getText().clear();
                     description.getText().clear();
                     addNote.dismiss();
-                    refreshList();
                 }
             });
 
@@ -218,22 +193,21 @@ public class ToDoFragment extends Fragment {
             if (resultCode == Activity.RESULT_OK) {
                 String sub = data.getStringExtra("SUB");
                 String desc = data.getStringExtra("DESC");
-                int pos=data.getIntExtra("POSITION",0);
-                Todo t=todos.get(pos-1);
-                t.setDescription(desc);
-                t.setSubject(sub);
-                database.todoDao().updateTodo(t);
+                int pos = data.getIntExtra("POSITION", 0);
+                todoAdapter.updateTodo(pos,new Todo(sub,desc));
 
-                TodoRecyclerViewAdapter adapter = new TodoRecyclerViewAdapter(todos,database, getContext());
-                todoList.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
+
+//                Todo t = todos.get(pos - 1);
+//                t.setDescription(desc);
+//                t.setSubject(sub);
+//                database.todoDao().updateTodo(t);
+//
+//                TodoRecyclerViewAdapter adapter = new TodoRecyclerViewAdapter(todos, database, getContext());
+//                todoList.setAdapter(adapter);
+//                adapter.notifyDataSetChanged();
             }
         }
     }
-    public void refreshList(){
-        List<Todo> list=database.todoDao().getAllTodos();
-        todos.clear();
-        todos.addAll(list);
-        todoAdapter.notifyDataSetChanged();
-    }
+
+
 }
