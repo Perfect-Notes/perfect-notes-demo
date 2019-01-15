@@ -72,7 +72,6 @@ public class ToDoFragment extends Fragment {
         todoList = getView().findViewById(R.id.toDoList);
         todoList.setLayoutManager(new LinearLayoutManager(getContext()));
         todoList.setHasFixedSize(true);
-        //todoList.setAdapter(new TodoRecyclerViewAdapter(subjectList,descriptionList));
         todoAdapter = new TodoRecyclerViewAdapter(subjectList,descriptionList,getContext());
         todoList.setAdapter(todoAdapter);
     }
