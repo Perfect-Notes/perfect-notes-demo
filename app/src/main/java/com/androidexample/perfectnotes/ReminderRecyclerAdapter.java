@@ -6,28 +6,31 @@ import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecyclerAdapter.myViewHolder>  {
 
 
-    ArrayList<String> dateList;
-    ArrayList<String> timeList;
-    ArrayList<String> label;
+    //ArrayList<String> dateList;
+    //ArrayList<String> timeList;
+    //ArrayList<String> label;
+    List<Reminder> reminders;
     Context context;
+    ReminderDatabase database;
 
-
-    ReminderRecyclerAdapter(ArrayList<String> date,ArrayList<String> time,ArrayList<String> label,Context context){
-        this.dateList = date;
-        this.timeList = time;
+    ReminderRecyclerAdapter(List<Reminder> reminders,ReminderDatabase database,Context context){
+        this.reminders = reminders;
+        this.database = database;
         this.context = context;
-        this.label = label;
+
     }
 
     @NonNull
@@ -40,15 +43,14 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
 
     @Override
     public void onBindViewHolder(@NonNull myViewHolder myViewHolder, int i) {
-        myViewHolder.dateText.setText(dateList.get(i));
-        myViewHolder.timeText.setText(timeList.get(i));
-        myViewHolder.reminderHeading.setText(label.get(i));
-
+        myViewHolder.timeText.setText(reminders.get(i).getTime());
+        myViewHolder.dateText.setText(reminders.get(i).getDate());
+        myViewHolder.reminderHeading.setText(reminders.get(i).getLabel());
     }
 
     @Override
     public int getItemCount() {
-        return dateList.size();
+        return reminders.size();
     }
 
 
@@ -71,13 +73,13 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
             final int position = getAdapterPosition();
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Are you Sure?");
-            builder.setMessage("Delete reminder: " + label.get(position) + "?");
+            //builder.setMessage("Delete reminder: " + label.get(position) + "?");
             builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    dateList.remove(position);
-                    timeList.remove(position);
-                    label.remove(position);
+                    //dateList.remove(position);
+                    //timeList.remove(position);
+                    //label.remove(position);
                     notifyDataSetChanged();
                     dialog.dismiss();
                 }
@@ -91,5 +93,12 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
             builder.show();
             return true;
         }
+    }
+
+    public void insertReminder(Reminder reminder){
+        reminders.add(reminder);
+        database.reminderDoa().insert(reminder);
+        Log.i("recycler","inserted" + reminder.getLabel());
+        notifyDataSetChanged();
     }
 }

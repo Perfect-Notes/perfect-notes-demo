@@ -16,6 +16,9 @@ public class Reminder {
     @ColumnInfo(name = "date")
     public String date;
 
+    @ColumnInfo(name = "time")
+    public String time;
+
     public String getLabel() {
         return label;
     }
@@ -40,14 +43,11 @@ public class Reminder {
         this.time = time;
     }
 
-    @ColumnInfo(name = "time")
-    public String time;
 
 
-
-    public Reminder(String dateList,String timeList, String label){
-        this.date = dateList;
-        this.time = timeList;
+    public Reminder(String date,String time, String label){
+        this.date = date;
+        this.time = time;
         this.label = label;
     }
 

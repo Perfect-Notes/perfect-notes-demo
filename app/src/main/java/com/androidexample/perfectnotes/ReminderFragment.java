@@ -4,6 +4,7 @@ package com.androidexample.perfectnotes;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.arch.persistence.room.Room;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.zip.Inflater;
 
 
@@ -44,7 +46,10 @@ public class ReminderFragment extends Fragment {
     TextInputEditText reminderDialogLabel;
 
 
-    ArrayList<String> dateList,timeList,labelList;
+    //ArrayList<String> dateList,timeList,labelList;
+    List<Reminder> reminders;
+
+    ReminderDatabase database;
     public ReminderFragment() {
         // Required empty public constructor
     }
@@ -54,9 +59,9 @@ public class ReminderFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        dateList = new ArrayList<>();
-        timeList = new ArrayList<>();
-        labelList = new ArrayList<>();
+        //dateList = new ArrayList<>();
+        //timeList = new ArrayList<>();
+        //labelList = new ArrayList<>();
 
         View view = inflater.inflate(R.layout.fragment_reminder,container,false);
         addFab = view.findViewById(R.id.add_fab);
@@ -89,13 +94,16 @@ public class ReminderFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        database = Room.databaseBuilder(getActivity(),ReminderDatabase.class,"ReminderDb").allowMainThreadQueries().build();
+        reminders = database.reminderDoa().getAllReminders();
 
         //recycler view
         reminderRecycler = getView().findViewById(R.id.reminderRecycler);
         reminderRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         reminderRecycler.setHasFixedSize(true);
-        reminderRecyclerAdapter = new ReminderRecyclerAdapter(dateList,timeList,labelList,getContext());
+        reminderRecyclerAdapter = new ReminderRecyclerAdapter(reminders,database,getContext());
         reminderRecycler.setAdapter(reminderRecyclerAdapter);
+
 
     }
 
@@ -132,11 +140,8 @@ public class ReminderFragment extends Fragment {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dateList.add(chosenDate);
-                timeList.add(chosenTime);
-                labelList.add(reminderDialogLabel.getText().toString());
-                Toast.makeText(getContext(),dateList.toString() + timeList.toString() + labelList.toString(),Toast.LENGTH_SHORT).show();
-
+                String reminderLabel = reminderDialogLabel.getText().toString();
+                reminderRecyclerAdapter.insertReminder(new Reminder(chosenDate,chosenTime,reminderLabel));
                 //clear all the text inside the alert dialog
                 date.setText(R.string.sample_date);
                 time.setText(R.string.sample_time);
