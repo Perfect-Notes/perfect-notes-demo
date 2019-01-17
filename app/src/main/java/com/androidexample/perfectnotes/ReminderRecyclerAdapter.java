@@ -1,8 +1,10 @@
 package com.androidexample.perfectnotes;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -55,7 +57,7 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
 
 
 
-    class myViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
+    class myViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener,View.OnClickListener {
         TextView timeText,dateText,reminderHeading;
         CardView reminderCardLayout;
         public myViewHolder(@NonNull View itemView) {
@@ -66,6 +68,7 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
             reminderCardLayout = itemView.findViewById(R.id.reminderCardLayout);
 
             reminderCardLayout.setOnLongClickListener(this);
+            reminderCardLayout.setOnClickListener(this);
         }
 
         @Override
@@ -73,7 +76,7 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
             final int position = getAdapterPosition();
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Are you Sure?");
-            //builder.setMessage("Delete reminder: " + label.get(position) + "?");
+
             builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -95,12 +98,35 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
             builder.show();
             return true;
         }
+
+        @Override
+        public void onClick(View v) {
+            final int position = getAdapterPosition();
+            Intent intent = new Intent(v.getContext(),EditReminderActivity.class);
+            intent.putExtra("POSITION",position);
+            intent.putExtra("LABEL",reminders.get(position).label);
+            intent.putExtra("DATE",reminders.get(position).date);
+            intent.putExtra("TIME",reminders.get(position).time);
+            Log.i("onClick","button pressed");
+            ((Activity) context).startActivityForResult(intent,3);
+        }
     }
 
     public void insertReminder(Reminder reminder){
         reminders.add(reminder);
         database.reminderDoa().insert(reminder);
         Log.i("recycler","inserted" + reminder.getLabel());
+        notifyDataSetChanged();
+    }
+
+    public void updateReminder(int pos, Reminder reminder){
+        Reminder rem = reminders.get(pos);
+        rem.setDate(reminder.getDate());
+        rem.setTime(reminder.getTime());
+        rem.setLabel(reminder.getLabel());
+        database.reminderDoa().updateReminder(rem);
+        reminders.clear();
+        reminders.addAll(database.reminderDoa().getAllReminders());
         notifyDataSetChanged();
     }
 }

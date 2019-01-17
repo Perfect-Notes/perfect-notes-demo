@@ -1,10 +1,12 @@
 package com.androidexample.perfectnotes;
 
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.arch.persistence.room.Room;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -182,7 +184,6 @@ public class ReminderFragment extends Fragment {
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),listener,y,m,d);
         datePickerDialog.show();
-
     }
     //setter function
     public void setChosenDate(String chosenDate){
@@ -213,5 +214,20 @@ public class ReminderFragment extends Fragment {
     //setter function
     public void setChosenTime(String chosenTime){
         this.chosenTime = chosenTime;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 3){
+            if(resultCode == Activity.RESULT_OK){
+                String time = data.getStringExtra("TIME");
+                String date = data.getStringExtra("DATE");
+                String label = data.getStringExtra("LABEL");
+                int pos = data.getIntExtra("POSITION",0);
+                reminderRecyclerAdapter.updateReminder(pos,new Reminder(date,time,label));
+                Log.i("updated?","yes");
+            }
+        }
     }
 }
