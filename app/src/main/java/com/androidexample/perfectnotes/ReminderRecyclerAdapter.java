@@ -77,9 +77,11 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
             builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    //dateList.remove(position);
-                    //timeList.remove(position);
-                    //label.remove(position);
+                    //removing the reminder from the database
+                    database.reminderDoa().deleteReminder(reminders.get(position));
+                    //deleting the reminder from the reminderList
+                    reminders.remove(position);
+
                     notifyDataSetChanged();
                     dialog.dismiss();
                 }
