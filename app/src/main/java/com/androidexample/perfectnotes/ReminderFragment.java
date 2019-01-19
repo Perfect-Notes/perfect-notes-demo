@@ -35,15 +35,22 @@ import java.util.zip.Inflater;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ReminderFragment extends Fragment {
+public  class ReminderFragment extends Fragment {
 
     FloatingActionButton addFab;
     Dialog addReminderDialog;
-    TextView date,time;
+    TextView date, time;
     Calendar calendar;
-    Button addButton,cancelButton;
-    String chosenDate,chosenTime;
-    ReminderRecyclerAdapter reminderRecyclerAdapter;
+    Button addButton, cancelButton;
+    String chosenDate, chosenTime;
+
+
+
+
+
+    public static ReminderRecyclerAdapter reminderRecyclerAdapter;
+
+
     RecyclerView reminderRecycler;
     TextInputEditText reminderDialogLabel;
 
@@ -52,6 +59,7 @@ public class ReminderFragment extends Fragment {
     List<Reminder> reminders;
 
     ReminderDatabase database;
+
     public ReminderFragment() {
         // Required empty public constructor
     }
@@ -65,7 +73,7 @@ public class ReminderFragment extends Fragment {
         //timeList = new ArrayList<>();
         //labelList = new ArrayList<>();
 
-        View view = inflater.inflate(R.layout.fragment_reminder,container,false);
+        View view = inflater.inflate(R.layout.fragment_reminder, container, false);
         addFab = view.findViewById(R.id.add_fab);
         addFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,24 +104,24 @@ public class ReminderFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        database = Room.databaseBuilder(getActivity(),ReminderDatabase.class,"ReminderDb").allowMainThreadQueries().build();
+        database = Room.databaseBuilder(getActivity(), ReminderDatabase.class, "ReminderDb").allowMainThreadQueries().build();
         reminders = database.reminderDoa().getAllReminders();
 
         //recycler view
         reminderRecycler = getView().findViewById(R.id.reminderRecycler);
         reminderRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        reminderRecycler.setHasFixedSize(true);
-        reminderRecyclerAdapter = new ReminderRecyclerAdapter(reminders,database,getContext());
+//        reminderRecycler.setHasFixedSize(true);
+        reminderRecyclerAdapter = new ReminderRecyclerAdapter(reminders, database, getContext());
         reminderRecycler.setAdapter(reminderRecyclerAdapter);
 
 
     }
 
-    public void addReminder(){
+    public void addReminder() {
 
 
         addReminderDialog.show();
-        LinearLayout alertDialogTimeLayout,alertDialogDateLayout;
+        LinearLayout alertDialogTimeLayout, alertDialogDateLayout;
 
         alertDialogDateLayout = addReminderDialog.findViewById(R.id.alertDialogDateLayout);
         alertDialogTimeLayout = addReminderDialog.findViewById(R.id.alertDialogTimeLayout);
@@ -143,7 +151,7 @@ public class ReminderFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String reminderLabel = reminderDialogLabel.getText().toString();
-                reminderRecyclerAdapter.insertReminder(new Reminder(chosenDate,chosenTime,reminderLabel));
+                reminderRecyclerAdapter.insertReminder(new Reminder(chosenDate, chosenTime, reminderLabel));
                 //clear all the text inside the alert dialog
                 date.setText(R.string.sample_date);
                 time.setText(R.string.sample_time);
@@ -167,7 +175,7 @@ public class ReminderFragment extends Fragment {
         });
     }
 
-    public void setDate(){
+    public void setDate() {
         calendar = Calendar.getInstance();
         int d = calendar.get(Calendar.DAY_OF_MONTH);
         int m = calendar.get(Calendar.MONTH);
@@ -175,30 +183,31 @@ public class ReminderFragment extends Fragment {
         DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                String chosenDate = String.valueOf(dayOfMonth)+'/' + String.valueOf(month + 1) + '/' + String.valueOf(year);
+                String chosenDate = String.valueOf(dayOfMonth) + '/' + String.valueOf(month + 1) + '/' + String.valueOf(year);
                 date.setText(chosenDate);
                 setChosenDate(chosenDate);
 
             }
         };
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),listener,y,m,d);
+        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), listener, y, m, d);
         datePickerDialog.show();
     }
+
     //setter function
-    public void setChosenDate(String chosenDate){
+    public void setChosenDate(String chosenDate) {
         this.chosenDate = chosenDate;
     }
 
-    public void setTime(){
+    public void setTime() {
         calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int min = calendar.get(Calendar.MINUTE);
-        TimePickerDialog.OnTimeSetListener listener= new TimePickerDialog.OnTimeSetListener() {
+        TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                 String minString = String.valueOf(minute);
-                if(minute < 10){
+                if (minute < 10) {
                     minString = "0" + minString;
                 }
                 String chosenTime = String.valueOf(hourOfDay) + ':' + minString;
@@ -207,26 +216,26 @@ public class ReminderFragment extends Fragment {
             }
         };
 
-        TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),listener,hour,min,false);
+        TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), listener, hour, min, false);
         timePickerDialog.show();
     }
 
     //setter function
-    public void setChosenTime(String chosenTime){
+    public void setChosenTime(String chosenTime) {
         this.chosenTime = chosenTime;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 3){
-            if(resultCode == Activity.RESULT_OK){
+        if (requestCode == 3) {
+            if (resultCode == Activity.RESULT_OK) {
                 String time = data.getStringExtra("TIME");
                 String date = data.getStringExtra("DATE");
                 String label = data.getStringExtra("LABEL");
-                int pos = data.getIntExtra("POSITION",0);
-                reminderRecyclerAdapter.updateReminder(pos,new Reminder(date,time,label));
-                Log.i("updated?","yes");
+                int pos = data.getIntExtra("POSITION", 0);
+                reminderRecyclerAdapter.updateReminder(pos, new Reminder(date, time, label));
+                Log.i("updated?", "yes");
             }
         }
     }
