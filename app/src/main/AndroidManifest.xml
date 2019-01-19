@@ -22,6 +22,7 @@
         <activity android:name=".ViewToDo" />
         <activity android:name=".EditNote"/>
         <activity android:name=".EditReminderActivity"/>
+        <activity android:name=".timeTable.EnterActivity"/>
 
     </application>
 

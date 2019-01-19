@@ -88,7 +88,6 @@ public  class ReminderFragment extends Fragment {
         addReminderDialog.setContentView(R.layout.reminder_custom_dialog);
         addReminderDialog.setCancelable(true);
 
-
         date = addReminderDialog.findViewById(R.id.alertDialogDateTV);
         time = addReminderDialog.findViewById(R.id.alertDialogTimeTV);
         reminderDialogLabel = addReminderDialog.findViewById(R.id.reminderDialogLabel);

@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity
     ToDoFragment f;
     ReminderFragment r;
     public static final String TAG = "Main Activty";
+    time_table_fragment t;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         f = new ToDoFragment();
         r=new ReminderFragment();
+        t=new time_table_fragment();
         Toolbar toolbar = findViewById(R.id.toolbar);
         Log.i(TAG, "onCreate: Main Activity");
         setSupportActionBar(toolbar);
@@ -97,10 +99,10 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.time_table) {
             // Handle the camera action
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, new time_table_fragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, t).commit();
 
         } else if (id == R.id.events) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, new time_table_fragment()).commit();
+//            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, new ).commit();
 
         } else if (id == R.id.reminders) {
 
@@ -123,6 +125,9 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         if(data.hasExtra("REMINDER")){
             r.onActivityResult(requestCode,resultCode,data);
+        }
+        else if (data.hasExtra("TIME_TABLE")){
+            t.onActivityResult(requestCode,resultCode,data);
         }
         else
         f.onActivityResult(requestCode,resultCode,data);
