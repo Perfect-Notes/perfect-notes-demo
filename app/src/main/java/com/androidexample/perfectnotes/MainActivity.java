@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity
 
     //ListView listView;
     ToDoFragment f;
+    ReminderFragment r;
     public static final String TAG = "Main Activty";
 
     @Override
@@ -35,17 +36,12 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         f = new ToDoFragment();
+        r=new ReminderFragment();
         Toolbar toolbar = findViewById(R.id.toolbar);
         Log.i(TAG, "onCreate: Main Activity");
         setSupportActionBar(toolbar);
         //listView = findViewById(R.id.lv1);
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Bhai ise thoda thik kariyo", Snackbar.LENGTH_LONG).show();
-            }
-        });
+
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -108,7 +104,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.reminders) {
 
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, new ReminderFragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container,r).commit();
 
         } else if (id == R.id.notes) {
 //            Bundle b = new Bundle();
@@ -125,6 +121,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if(data.hasExtra("REMINDER")){
+            r.onActivityResult(requestCode,resultCode,data);
+        }
+        else
         f.onActivityResult(requestCode,resultCode,data);
     }
 }

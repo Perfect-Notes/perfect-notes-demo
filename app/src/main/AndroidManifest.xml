@@ -20,7 +20,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".ViewToDo" />
-        <activity android:name=".EditNote"></activity>
+        <activity android:name=".EditNote"/>
+        <activity android:name=".EditReminderActivity"/>
+
     </application>
 
 </manifest>
