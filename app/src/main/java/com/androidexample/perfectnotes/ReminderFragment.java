@@ -220,11 +220,13 @@ public class ReminderFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 3){
+            Log.i("Request code","3");
             if(resultCode == Activity.RESULT_OK){
                 String time = data.getStringExtra("TIME");
                 String date = data.getStringExtra("DATE");
                 String label = data.getStringExtra("LABEL");
                 int pos = data.getIntExtra("POSITION",0);
+                Log.i("pos","pos = " + String.valueOf(pos));
                 reminderRecyclerAdapter.updateReminder(pos,new Reminder(date,time,label));
                 Log.i("updated?","yes");
             }
