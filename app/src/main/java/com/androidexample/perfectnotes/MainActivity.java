@@ -1,13 +1,10 @@
 package com.androidexample.perfectnotes;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,31 +18,20 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     //ListView listView;
-    Fragment f;
-    public static final String TAG = "Main Activty";
-
+    ReminderFragment r;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        f = new ToDoFragment();
         Toolbar toolbar = findViewById(R.id.toolbar);
-        Log.i(TAG, "onCreate: Main Activity");
         setSupportActionBar(toolbar);
+        r = new ReminderFragment();
         //listView = findViewById(R.id.lv1);
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Bhai ise thoda thik kariyo", Snackbar.LENGTH_LONG).show();
-            }
-        });
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -56,7 +42,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        String[] string = new String[]{"TIme Table", "Today's Events", "Notes", "Reminders"};
+        String[] string=new String[]{"TIme Table","Today's Events","Notes","Reminders"};
         //ArrayAdapter<String> adapter=new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_list_item_1,string);
         //listView.setAdapter(adapter);
     }
@@ -101,20 +87,16 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.time_table) {
             // Handle the camera action
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, new time_table_fragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container,new time_table_fragment()).commit();
 
         } else if (id == R.id.events) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, new time_table_fragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container,new time_table_fragment()).commit();
 
         } else if (id == R.id.reminders) {
-
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, new ReminderFragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container,new ReminderFragment()).commit();
 
         } else if (id == R.id.notes) {
-//            Bundle b = new Bundle();
-//            b.putBoolean("BACK_PRESSED", false);
-//            f.setArguments(b);
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, f).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container,new ToDoFragment()).commit();
 
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -123,18 +105,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        ArrayList<String> sub = data.getStringArrayListExtra("SUB_RESULT");
-        sub.remove(data.getIntExtra("POS",0)+1);
-
-        data.putExtra("SUB_RESULT", sub);
-        f.onActivityResult(requestCode, resultCode, data);
-        //getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, f).commit();
-//                subjectList = sub;
-//                descriptionList = desc;
-//                todoAdapter.notifyDataSetChanged();
-
-
+        r.onActivityResult(requestCode,resultCode,data);
     }
 }

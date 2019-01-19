@@ -3,10 +3,7 @@ package com.androidexample.perfectnotes;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
@@ -21,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -32,19 +30,14 @@ import java.util.ArrayList;
  */
 public class ToDoFragment extends Fragment {
 
-    public static final String TAG = "fragy";
+
     Dialog addNote;
-    TextInputEditText description, subject;
-public     RecyclerView todoList;
+    TextInputEditText description,subject;
+    RecyclerView todoList;
     TodoRecyclerViewAdapter todoAdapter;
-
-   public ArrayList<String> descriptionList;
-    public ArrayList<String> subjectList;
-
-
+    ArrayList<String> descriptionList;
+    ArrayList<String> subjectList;
     Button add;
-    SQLiteDatabase database;
-    int pos;
 
     public ToDoFragment() {
         // Required empty public constructor
@@ -63,27 +56,13 @@ public     RecyclerView todoList;
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-//        Log.i(TAG, "onCreate: "+getArguments().getBoolean("BACK_PRESSED"));
-        if (getArguments() != null) {
-            if (getArguments().getBoolean("BACK_PRESSED", false)) {
-                ArrayList<String> sub = getArguments().getStringArrayList("SUBJECTS");
-
-            }
-        }
-
         descriptionList = new ArrayList<>();
         subjectList = new ArrayList<>();
-        //descriptionList = new ArrayList<>();
-        //subjectList = new ArrayList<>();
 
         //dialog
         addNote = new Dialog(getContext());
         addNote.setCancelable(true);
         addNote.setContentView(R.layout.to_do_custom_dialog);
-        ToDoDatabaseHelper helper = new ToDoDatabaseHelper(getActivity());
-        database = helper.getWritableDatabase();
-        pos=0;
-
 
     }
 
@@ -93,14 +72,8 @@ public     RecyclerView todoList;
         todoList = getView().findViewById(R.id.toDoList);
         todoList.setLayoutManager(new LinearLayoutManager(getContext()));
         todoList.setHasFixedSize(true);
-        //todoList.setAdapter(new TodoRecyclerViewAdapter(subjectList,descriptionList));
-        todoAdapter = new TodoRecyclerViewAdapter(subjectList, descriptionList, getContext());
-
-        //todoAdapter = new TodoRecyclerViewAdapter(subjectList,descriptionList,getContext());
-        todoAdapter = new TodoRecyclerViewAdapter(getAllItems(),getContext());
-
+        todoAdapter = new TodoRecyclerViewAdapter(subjectList,descriptionList,getContext());
         todoList.setAdapter(todoAdapter);
-
     }
 
     @Override
@@ -111,14 +84,14 @@ public     RecyclerView todoList;
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.to_do_menu, menu);
+        inflater.inflate(R.menu.to_do_menu,menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId() == R.id.addtoDo_menu) {
+        if(item.getItemId() == R.id.addtoDo_menu){
             //Toast.makeText(getContext(),"Add clicked",Toast.LENGTH_SHORT).show();
             addNote.show();
             add = addNote.findViewById(R.id.addButtonCustomDialog);
@@ -163,25 +136,18 @@ public     RecyclerView todoList;
                 @Override
                 public void onClick(View v) {
 
-                    String sub, desc;
+                    String sub,desc;
                     try {
                         sub = subject.getText().toString();
                         desc = description.getText().toString();
-                        Toast.makeText(getContext(), sub + " " + desc, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(),sub + " " + desc,Toast.LENGTH_SHORT).show();
                         subjectList.add(sub);
                         descriptionList.add(desc);
                         todoAdapter.notifyDataSetChanged();
-                    } catch (NullPointerException e) {
-                        Toast.makeText(getContext()," for null pointer " ,Toast.LENGTH_SHORT).show();
-                        pos++;
-
-                        //subjectList.add(sub);
-                        //descriptionList.add(desc);
-                        //todoAdapter.notifyDataSetChanged();
                     }
-//                    catch (NullPointerException e){
-//                        e.printStackTrace();
-//                    }
+                    catch (NullPointerException e){
+                        e.printStackTrace();
+                    }
                     subject.getText().clear();
                     description.getText().clear();
                     addNote.dismiss();
@@ -189,41 +155,23 @@ public     RecyclerView todoList;
             });
 
         }
-
         @Override
         public void afterTextChanged(Editable s) {
 
         }
     };
 
-    @Override
+    /*@Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 2) {
-            if (resultCode == Activity.RESULT_OK) {
-                ArrayList<String> sub = data.getStringArrayListExtra("SUB_RESULT");
-                ArrayList<String> desc = data.getStringArrayListExtra("DESC_RESULT");
+        super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode == 2){
+            if(resultCode == Activity.RESULT_OK){
+                ArrayList<String> sub = data.getStringArrayListExtra("SUB_FINAL");
+                ArrayList<String> desc = data.getStringArrayListExtra("DESC_FINAL");
                 subjectList = sub;
-
                 descriptionList = desc;
-                TodoRecyclerViewAdapter adapter=new TodoRecyclerViewAdapter(sub,desc,getContext());
-                todoList.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
+                todoAdapter.notifyDataSetChanged();
             }
         }
-    }
-    public Cursor getAllItems(){
-        return database.query(ToDoDatabaseHelper.TABLE_NAME,null,null,null,null,null,ToDoDatabaseHelper.COL_2);
-    }
-
-    public void addData(String subject, String description, int pos){
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(ToDoDatabaseHelper.COL_2,pos);
-        contentValues.put(ToDoDatabaseHelper.COL_3,subject);
-        contentValues.put(ToDoDatabaseHelper.COL_4,description);
-
-        database.insert(ToDoDatabaseHelper.TABLE_NAME,null,contentValues);
-        todoAdapter.swapCursor(getAllItems());
-    }
-
+    }*/
 }

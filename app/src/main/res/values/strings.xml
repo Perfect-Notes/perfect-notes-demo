@@ -15,4 +15,10 @@
     <string name="add_note">ADD NOTE:</string>
     <string name="edit_note">Edit Note</string>
     <string name="save">Save</string>
+    <string name="sample_text">sample text</string>
+    <string name="sample_date">dd/mm/yyyy</string>
+    <string name="sample_time">hh:mm</string>
+    <string name="add_reminder">ADD REMINDER</string>
+    <string name="label">Label</string>
+    <string name="cancel">cancel</string>
 </resources>
