@@ -24,6 +24,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.androidexample.perfectnotes.reminderDb.Reminder;
+import com.androidexample.perfectnotes.reminderDb.ReminderDatabase;
+
 import java.util.Calendar;
 import java.util.List;
 

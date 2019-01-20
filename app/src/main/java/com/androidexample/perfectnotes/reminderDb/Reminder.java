@@ -1,4 +1,4 @@
-package com.androidexample.perfectnotes;
+package com.androidexample.perfectnotes.reminderDb;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;

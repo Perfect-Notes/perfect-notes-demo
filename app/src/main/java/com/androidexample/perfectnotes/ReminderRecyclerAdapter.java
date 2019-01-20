@@ -14,6 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.androidexample.perfectnotes.reminderDb.Reminder;
+import com.androidexample.perfectnotes.reminderDb.ReminderDatabase;
+
 import java.util.List;
 
 
