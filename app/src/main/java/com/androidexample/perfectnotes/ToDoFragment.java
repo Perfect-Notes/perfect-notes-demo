@@ -3,26 +3,35 @@ package com.androidexample.perfectnotes;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.arch.persistence.room.Room;
+import android.arch.persistence.room.RoomDatabase;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.Toast;
 
+
+import com.androidexample.perfectnotes.db.TodoDatabse;
+
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -31,14 +40,18 @@ import java.util.ArrayList;
 public class ToDoFragment extends Fragment {
 
 
+    public List<Todo> todos;
     Dialog addNote;
-    TextInputEditText description,subject;
-    RecyclerView todoList;
+    TextInputEditText description, subject;
+    public RecyclerView todoList;
     TodoRecyclerViewAdapter todoAdapter;
-    ArrayList<String> descriptionList;
-    ArrayList<String> subjectList;
-    Button add;
 
+
+    Button add;
+    TodoDatabse database;
+    int pos;
+
+    public static final String TAG="frag";
     public ToDoFragment() {
         // Required empty public constructor
     }
@@ -56,10 +69,6 @@ public class ToDoFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        descriptionList = new ArrayList<>();
-        subjectList = new ArrayList<>();
-
-        //dialog
         addNote = new Dialog(getContext());
         addNote.setCancelable(true);
         addNote.setContentView(R.layout.to_do_custom_dialog);
@@ -70,12 +79,18 @@ public class ToDoFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         todoList = getView().findViewById(R.id.toDoList);
+
+        database = Room.databaseBuilder(getActivity(), TodoDatabse.class, "todoDb").allowMainThreadQueries().build();
+        todos = database.todoDao().getAllTodos();
+
         todoList.setLayoutManager(new LinearLayoutManager(getContext()));
-        todoList.setHasFixedSize(true);
-        //todoList.setAdapter(new TodoRecyclerViewAdapter(subjectList,descriptionList));
-        todoAdapter = new TodoRecyclerViewAdapter(subjectList,descriptionList,getContext());
+        todoAdapter = new TodoRecyclerViewAdapter(todos, database, getContext());
+        //todoAdapter = new TodoRecyclerViewAdapter(subjectList,descriptionList,getContext());
+//        todoAdapter = new TodoRecyclerViewAdapter(getAllItems(),getContext());
         todoList.setAdapter(todoAdapter);
+
     }
+
 
     @Override
     public void onDestroyView() {
@@ -85,14 +100,14 @@ public class ToDoFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.to_do_menu,menu);
+        inflater.inflate(R.menu.to_do_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if(item.getItemId() == R.id.addtoDo_menu){
+        if (item.getItemId() == R.id.addtoDo_menu) {
             //Toast.makeText(getContext(),"Add clicked",Toast.LENGTH_SHORT).show();
             addNote.show();
             add = addNote.findViewById(R.id.addButtonCustomDialog);
@@ -137,18 +152,26 @@ public class ToDoFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
 
-                    String sub,desc;
+                    String sub, desc;
                     try {
                         sub = subject.getText().toString();
                         desc = description.getText().toString();
-                        Toast.makeText(getContext(),sub + " " + desc,Toast.LENGTH_SHORT).show();
-                        subjectList.add(sub);
-                        descriptionList.add(desc);
-                        todoAdapter.notifyDataSetChanged();
+                        Toast.makeText(getContext(), "ADDED -\n" + sub, Toast.LENGTH_SHORT).show();
+                        todoAdapter.insertTodo(new Todo(sub,desc));
+
+
+                    } catch (NullPointerException e) {
+                        Toast.makeText(getContext(), " for null pointer ", Toast.LENGTH_SHORT).show();
+                        pos++;
                     }
-                    catch (NullPointerException e){
-                        e.printStackTrace();
-                    }
+
+                    //subjectList.add(sub);
+                    //descriptionList.add(desc);
+                    //todoAdapter.notifyDataSetChanged();
+
+//                    catch (NullPointerException e){
+//                        e.printStackTrace();
+//                    }
                     subject.getText().clear();
                     description.getText().clear();
                     addNote.dismiss();
@@ -156,23 +179,35 @@ public class ToDoFragment extends Fragment {
             });
 
         }
+
         @Override
         public void afterTextChanged(Editable s) {
 
         }
     };
 
-    /*@Override
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode,resultCode,data);
-        if(requestCode == 2){
-            if(resultCode == Activity.RESULT_OK){
-                ArrayList<String> sub = data.getStringArrayListExtra("SUB_FINAL");
-                ArrayList<String> desc = data.getStringArrayListExtra("DESC_FINAL");
-                subjectList = sub;
-                descriptionList = desc;
-                todoAdapter.notifyDataSetChanged();
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 2) {
+            if (resultCode == Activity.RESULT_OK) {
+                String sub = data.getStringExtra("SUB");
+                String desc = data.getStringExtra("DESC");
+                int pos = data.getIntExtra("POSITION", 0);
+                todoAdapter.updateTodo(pos,new Todo(sub,desc));
+
+
+//                Todo t = todos.get(pos - 1);
+//                t.setDescription(desc);
+//                t.setSubject(sub);
+//                database.todoDao().updateTodo(t);
+//
+//                TodoRecyclerViewAdapter adapter = new TodoRecyclerViewAdapter(todos, database, getContext());
+//                todoList.setAdapter(adapter);
+//                adapter.notifyDataSetChanged();
             }
         }
-    }*/
+    }
+
+
 }

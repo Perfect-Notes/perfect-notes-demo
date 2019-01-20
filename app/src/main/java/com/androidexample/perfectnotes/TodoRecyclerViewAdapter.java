@@ -8,21 +8,27 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.androidexample.perfectnotes.db.TodoDatabse;
+
+import java.util.List;
 
 public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerViewAdapter.myViewHolder> {
 
-    ArrayList<String> subject;
-    ArrayList<String> description;
+
+    public static final String TAG = "recycler check";
     Context context;
-    TodoRecyclerViewAdapter(ArrayList<String> subject,ArrayList<String> description,Context context){
-        this.subject = subject;
-        this.description = description;
+    List<Todo> todos;
+    TodoDatabse database;
+
+    public TodoRecyclerViewAdapter(List<Todo> todos,TodoDatabse database, Context context) {
+        this.database=database;
+        this.todos = todos;
         this.context = context;
     }
 
@@ -31,26 +37,29 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
     public myViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
 
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.to_do_list_item,parent,false);
-
+        View view = inflater.inflate(R.layout.to_do_list_item, parent, false);
         return new myViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final myViewHolder holder, int i) {
 
-        holder.listElementHeader.setText(subject.get(i));
-
-    }
+        holder.listElementHeader.setText(todos.get(i).getSubject());
+ }
 
     @Override
     public int getItemCount() {
-        return subject.size();
+        if (todos == null) {
+            return 0;
+        }
+        return todos.size();
     }
 
-    class myViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener,View.OnClickListener{
-            TextView listElementHeader;
-            CardView todoListCard;
+
+    class myViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener {
+        TextView listElementHeader;
+        CardView todoListCard;
+
         public myViewHolder(@NonNull View itemView) {
             super(itemView);
             listElementHeader = itemView.findViewById(R.id.listElementHeader);
@@ -67,14 +76,16 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
             final AlertDialog.Builder deleteDialog = new AlertDialog.Builder(context);
             deleteDialog.setCancelable(true);
             deleteDialog.setTitle("Delete Note:");
-            deleteDialog.setMessage("Subject: " + subject.get(position) + "\n\nAre you sure?");
+            deleteDialog.setMessage("Subject: " + todos.get(position).getSubject() + "\n\nAre you sure?");
             deleteDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    subject.remove(position);
-                    description.remove(position);
+                    Log.i(TAG, "onClick: " + todos.get(position).getId());
+                    database.todoDao().deleteTodo(todos.get(position));
+                    todos.remove(position);
                     notifyDataSetChanged();
                     dialog.cancel();
+
                 }
             });
             deleteDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -90,14 +101,33 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
         @Override
         public void onClick(View v) {
             int position = getAdapterPosition();
-            Intent intent = new Intent(v.getContext(),EditToDo.class);
-            intent.putExtra("SUBJECT_LIST",subject);
-            intent.putExtra("BODY_LIST",description);
-            intent.putExtra("POSITION",position);
-            //intent.putExtra("BODY",description.get(position));
-            //context.startActivity(intent);
-            ((Activity) context).startActivityForResult(intent,2);
+            Intent intent = new Intent(v.getContext(), ViewToDo.class);
+            intent.putExtra("POSITION", position);
+            intent.putExtra("SUBJECT", todos.get(position).getSubject());
+            intent.putExtra("BODY", todos.get(position).getDescription());
+//            context.startActivity(intent);
+            ((Activity) context).startActivityForResult(intent, 2);
         }
+    }
+
+    public Todo getTodo(int position) {
+        return todos.get(position);
+    }
+    public void insertTodo(Todo todo){
+        todos.add(todo);
+        database.todoDao().insert(todo);
+        Log.i(TAG, "insertTodo: "+todo.getId());
+        notifyDataSetChanged();
+    }
+    public void updateTodo(int pos,Todo todo){
+        Todo t=todos.get(pos);
+        t.setSubject(todo.getSubject());
+        t.setDescription(t.getDescription());
+        database.todoDao().updateTodo(t);
+        todos.clear();
+        todos.addAll(database.todoDao().getAllTodos());
+        notifyDataSetChanged();
+        Log.i(TAG, "updateTodo: "+todo.getId());
     }
 
 }

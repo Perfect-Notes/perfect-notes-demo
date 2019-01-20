@@ -1,10 +1,13 @@
 package com.androidexample.perfectnotes;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,26 +21,29 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     //ListView listView;
+    ToDoFragment f;
+    ReminderFragment r;
+    public static final String TAG = "Main Activty";
+    time_table_fragment t;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        f = new ToDoFragment();
+        r=new ReminderFragment();
+        t=new time_table_fragment();
         Toolbar toolbar = findViewById(R.id.toolbar);
+        Log.i(TAG, "onCreate: Main Activity");
         setSupportActionBar(toolbar);
         //listView = findViewById(R.id.lv1);
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Bhai ise thoda thik kariyo", Snackbar.LENGTH_LONG).show();
-            }
-        });
+
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -48,7 +54,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        String[] string=new String[]{"TIme Table","Today's Events","Notes","Reminders"};
+        String[] string = new String[]{"Time Table", "Today's Events", "Notes", "Reminders"};
         //ArrayAdapter<String> adapter=new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_list_item_1,string);
         //listView.setAdapter(adapter);
     }
@@ -93,20 +99,37 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.time_table) {
             // Handle the camera action
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container,new time_table_fragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, t).commit();
 
         } else if (id == R.id.events) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container,new time_table_fragment()).commit();
+//            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, new ).commit();
 
         } else if (id == R.id.reminders) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container,new ReminderFragment()).commit();
+
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container,r).commit();
 
         } else if (id == R.id.notes) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container,new ToDoFragment()).commit();
+//            Bundle b = new Bundle();
+//            b.putBoolean("BACK_PRESSED", false);
+//            f.setArguments(b);
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, f).commit();
 
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(data.hasExtra("REMINDER")){
+            r.onActivityResult(requestCode,resultCode,data);
+        }
+        else if (data.hasExtra("TIME_TABLE")){
+            t.onActivityResult(requestCode,resultCode,data);
+        }
+        else
+        f.onActivityResult(requestCode,resultCode,data);
     }
 }
