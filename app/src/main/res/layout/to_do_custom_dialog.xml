@@ -65,18 +65,22 @@
         android:layout_gravity="center_horizontal"
         >
         <Button
+            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/addButtonCustomDialog"
             android:text="@string/add"
             android:enabled="false"
+            android:theme="@style/AppTheme.Button"
+
             />
-        <Button
+        <android.support.v7.widget.AppCompatButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cancelButtonCustomDialog"
             android:text="Cancel"
             android:layout_marginStart="10dp"
+            android:theme="@style/AppTheme.Button"
             />
 
     </LinearLayout>

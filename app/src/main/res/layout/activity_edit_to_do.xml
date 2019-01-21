@@ -4,35 +4,54 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ViewToDo"
     android:orientation="vertical"
-    android:padding="20dp"
-    >
+    tools:context=".ViewToDo">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/subjectHeader"
-        android:text="SAMPLE TEXT"
-        android:textSize="25sp"
-        android:textColor="#000"
-        android:textStyle="bold"
-        />
+        android:elevation="10dp"
+        android:padding="10dp"
+        android:layout_margin="10dp"
+        app:cardCornerRadius="5dp">
+
+        <TextView
+            android:id="@+id/subjectHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sample_text"
+            android:textColor="#000"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:padding="10dp"
+            />
+    </android.support.v7.widget.CardView>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="5dp"
-        android:background="@drawable/straight_line"
         android:layout_marginTop="15dp"
+        android:background="@drawable/straight_line"
         android:layerType="software" />
 
-    <TextView
-        android:id="@+id/description_edit_note"
-        android:layout_width="wrap_content"
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:elevation="10dp"
+
+        app:cardCornerRadius="5dp"
+        android:layout_margin="10dp"
         android:layout_marginTop="30dp"
-        android:textSize="14sp"
-        android:text="SAMPLE TEXT"
-        android:textColor="#000"
-        />
+        >
+
+        <TextView
+            android:padding="10dp"
+            android:id="@+id/description_edit_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sample_text"
+            android:textColor="#000"
+            android:textSize="14sp" />
+    </android.support.v7.widget.CardView>
 
 </LinearLayout>

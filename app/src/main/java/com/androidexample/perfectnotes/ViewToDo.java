@@ -37,7 +37,7 @@ public class ViewToDo extends AppCompatActivity {
 
         if (extras != null) {
             String sub = extras.getString("SUBJECT");
-            String desc = extras.getString("BODY");
+            String desc = extras.getString("DESC");
             pos = extras.getInt("POSITION");
 
 

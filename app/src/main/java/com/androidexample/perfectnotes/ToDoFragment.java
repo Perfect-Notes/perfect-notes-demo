@@ -10,8 +10,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.TextViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -19,9 +21,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -45,6 +45,7 @@ public class ToDoFragment extends Fragment {
     TextInputEditText description, subject;
     public RecyclerView todoList;
     TodoRecyclerViewAdapter todoAdapter;
+    FloatingActionButton addToDo;
 
 
     Button add;
@@ -76,6 +77,18 @@ public class ToDoFragment extends Fragment {
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        addToDo = view.findViewById(R.id.add_fab_to_do);
+        addToDo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                add_to_do();
+            }
+        });
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         todoList = getView().findViewById(R.id.toDoList);
@@ -98,39 +111,25 @@ public class ToDoFragment extends Fragment {
         todoList = null;
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.to_do_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public void add_to_do(){
+        addNote.show();
+        add = addNote.findViewById(R.id.addButtonCustomDialog);
+        Button cancel = addNote.findViewById(R.id.cancelButtonCustomDialog);
+        subject = addNote.findViewById(R.id.subjectETCustonDialog);
+        description = addNote.findViewById(R.id.description);
 
-        if (item.getItemId() == R.id.addtoDo_menu) {
-            //Toast.makeText(getContext(),"Add clicked",Toast.LENGTH_SHORT).show();
-            addNote.show();
-            add = addNote.findViewById(R.id.addButtonCustomDialog);
-            Button cancel = addNote.findViewById(R.id.cancelButtonCustomDialog);
-            subject = addNote.findViewById(R.id.subjectETCustonDialog);
-            description = addNote.findViewById(R.id.description);
-
-            //text change listeners
-            subject.addTextChangedListener(addNoteTextWatcher);
-            description.addTextChangedListener(addNoteTextWatcher);
+        //text change listeners
+        subject.addTextChangedListener(addNoteTextWatcher);
+        description.addTextChangedListener(addNoteTextWatcher);
 
 
-            cancel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    addNote.dismiss();
-                }
-            });
-
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addNote.dismiss();
+            }
+        });
     }
 
 
@@ -146,12 +145,10 @@ public class ToDoFragment extends Fragment {
             String desc = description.getText().toString();
             //check if both subject and description have some text written
             add.setEnabled(!sub.isEmpty() && !desc.isEmpty());
-
             //on click listener for add button if it is enabled
             add.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                     String sub, desc;
                     try {
                         sub = subject.getText().toString();

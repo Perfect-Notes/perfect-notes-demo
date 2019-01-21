@@ -104,7 +104,7 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
             Intent intent = new Intent(v.getContext(), ViewToDo.class);
             intent.putExtra("POSITION", position);
             intent.putExtra("SUBJECT", todos.get(position).getSubject());
-            intent.putExtra("BODY", todos.get(position).getDescription());
+            intent.putExtra("DESC", todos.get(position).getDescription());
 //            context.startActivity(intent);
             ((Activity) context).startActivityForResult(intent, 2);
         }

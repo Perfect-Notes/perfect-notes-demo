@@ -19,5 +19,14 @@
 
 
     </LinearLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="16dp"
+        android:src="@drawable/add_icon"
+        android:tint="#fff"
+        android:id="@+id/add_fab_to_do"
+        />
 
 </FrameLayout>

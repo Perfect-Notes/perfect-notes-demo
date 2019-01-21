@@ -124,14 +124,14 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(data!=null){
-        if(data.hasExtra("REMINDER")){
-            r.onActivityResult(requestCode,resultCode,data);
-        }
-        else if (data.hasExtra("TIME_TABLE")){
-            t.onActivityResult(requestCode,resultCode,data);
-        }
-        else
-        f.onActivityResult(requestCode,resultCode,data);
+            if(data.hasExtra("REMINDER")){
+                r.onActivityResult(requestCode,resultCode,data);
+            }
+            else if (data.hasExtra("TIME_TABLE")){
+                t.onActivityResult(requestCode,resultCode,data);
+            }
+            else
+            f.onActivityResult(requestCode,resultCode,data);
         }
     }
 }
