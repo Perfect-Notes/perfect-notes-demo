@@ -122,7 +122,7 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
     public void updateTodo(int pos,Todo todo){
         Todo t=todos.get(pos);
         t.setSubject(todo.getSubject());
-        t.setDescription(t.getDescription());
+        t.setDescription(todo.getDescription());
         database.todoDao().updateTodo(t);
         todos.clear();
         todos.addAll(database.todoDao().getAllTodos());
