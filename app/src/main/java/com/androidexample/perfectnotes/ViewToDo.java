@@ -69,12 +69,15 @@ public class ViewToDo extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if(data!=null){
         Intent i = new Intent();
         i.putExtra("SUB", data.getStringExtra("SUB"));
         i.putExtra("DESC", data.getStringExtra("DESC"));
         i.putExtra("POSITION", data.getIntExtra("POSITION", 0));
         setResult(Activity.RESULT_OK,i);
-        finish();
+        }
+            finish();
+        
 
     }
 
