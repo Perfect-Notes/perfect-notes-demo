@@ -14,6 +14,8 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +25,7 @@ import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.androidexample.perfectnotes.reminderDb.Reminder;
 import com.androidexample.perfectnotes.reminderDb.ReminderDatabase;
@@ -94,6 +97,11 @@ public  class ReminderFragment extends Fragment {
         date = addReminderDialog.findViewById(R.id.alertDialogDateTV);
         time = addReminderDialog.findViewById(R.id.alertDialogTimeTV);
         reminderDialogLabel = addReminderDialog.findViewById(R.id.reminderDialogLabel);
+
+        //adding textWatchers
+        date.addTextChangedListener(textWatcher);
+        time.addTextChangedListener(textWatcher);
+        reminderDialogLabel.addTextChangedListener(textWatcher);
     }
 
     @Override
@@ -186,6 +194,7 @@ public  class ReminderFragment extends Fragment {
         };
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), listener, y, m, d);
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
         datePickerDialog.show();
     }
 
@@ -237,4 +246,30 @@ public  class ReminderFragment extends Fragment {
             }
         }
     }
+
+    TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            if( date.getText() == getString(R.string.sample_date) || time.getText() == getString(R.string.sample_time) || reminderDialogLabel.getText().toString().equals("")){
+                //Toast.makeText(getContext(),"Please enter the date and/or time",Toast.LENGTH_SHORT).show();
+                addButton.setEnabled(false);
+            }
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if( date.getText() == getString(R.string.sample_date) || time.getText() == getString(R.string.sample_time) || reminderDialogLabel.getText().toString().equals("") ){
+                //Toast.makeText(getContext(),"Please enter the date and/or time",Toast.LENGTH_SHORT).show();
+                addButton.setEnabled(false);
+            }
+            else{
+                addButton.setEnabled(true);
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+        }
+    };
 }

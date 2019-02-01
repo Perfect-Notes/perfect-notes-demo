@@ -20,7 +20,7 @@
     <style name="AppTheme.Button" parent="Widget.AppCompat.Button">
 
         <item name="android:radius">10dp</item>
-        <item name="android:colorButtonNormal">@color/colorAccent</item>
+        <item name="android:colorButtonNormal">@color/button_bg</item>
         <item name="android:padding">20dp</item>
         <item name="android:textColor">#fff</item>
 
